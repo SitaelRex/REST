@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>AllUsersList</title>
+</head>
+<body>
+
+<table border="1">
+    <tr>
+        <th>Имя</th>
+        <th>Фамилия</th>
+        <th>Группа</th>
+    </tr>
+    <tr th:each="user : ${users}">
+        <td>
+            <a th:href="@{/{id}(id=${user.getId()})}" th:text="${user.getFirstName()}" target="_blank"></a>
+        </td>
+        <td>
+            <a th:href="@{/{id}(id=${user.getId()})}" th:text="${user.getLastName()}" target="_blank"></a>
+        </td>
+        <td>
+            <a th:href="@{/{id}(id=${user.getId()})}" th:text="${user.getGroupId()}" target="_blank"></a>
+        </td>
+    </tr>
+</table>
+<br/>
+<hr/>
+<a href="/new">Создать нового пользователя</a>
+</body>
+</html>
