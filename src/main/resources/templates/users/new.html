@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<form th:action="@{/}" th:method="POST" th:object="${user}">
+<form th:action="@{~/admin/}" th:method="POST" th:object="${user}">
     <label for="name">Имя: </label>
     <input type="text" th:field="*{firstName}" id="name"/>
     <br/>
@@ -24,7 +24,7 @@
 
     <input type="submit" value="Создать!"/>
 </form>
-<a th:href="@{/}"> Вернуться</a>
+<a th:href="@{~/admin/}"> Вернуться</a>
 
 </body>
 </html>
