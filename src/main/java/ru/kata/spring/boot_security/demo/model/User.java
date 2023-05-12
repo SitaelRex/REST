@@ -59,7 +59,7 @@ public class User implements UserDetails {
     }
 
     public Set<Role> getRoles() {
-        return roles;
+        return this.roles;
     }
 
     public void setRoles(Set<Role> roles) {
