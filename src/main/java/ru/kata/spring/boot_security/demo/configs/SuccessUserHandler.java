@@ -15,7 +15,6 @@ import java.util.Set;
 
 @Component
 public class SuccessUserHandler implements AuthenticationSuccessHandler {
-    //@Autowired
     private UserServiceImpl userService;
     @Autowired
     public SuccessUserHandler(UserServiceImpl userService) {
@@ -29,14 +28,12 @@ public class SuccessUserHandler implements AuthenticationSuccessHandler {
         //authentication.
         if (roles.contains("ROLE_USER")) {
             if (roles.contains("ROLE_ADMIN")) {
-                httpServletResponse.sendRedirect("/admin/");
+                httpServletResponse.sendRedirect("/admin");
              } else {
-                UserDetails userDetail = (UserDetails) authentication.getPrincipal();
-                ru.kata.spring.boot_security.demo.model.User u = userService.getUser(userDetail.getUsername());
-                httpServletResponse.sendRedirect("/user/"+u.getId());
+                httpServletResponse.sendRedirect("/user");
            }
         } else {
-            httpServletResponse.sendRedirect("/");
+            httpServletResponse.sendRedirect("/login");
         }
     }
 }

@@ -15,13 +15,13 @@
     <input type="text" th:field="*{lastName}" id="name2"/>
     <br/>
     <label for="group">Номер группы: </label>
-    <input type="number" step="1" onchange="this.value = Math.max(0, Math.min(20, parseInt(this.value)))" th:field="*{groupId}" id="group"/>
+    <input type="number" step="1" onchange="this.value = Math.max(0, Math.min(20, parseInt(this.value)))"
+           th:field="*{groupId}" id="group"/>
     <br/>
     <label for="email">Электронная почта: </label>
     <input type="text" th:field="*{email}" id="email"/>
     <br/>
     <input type="submit" value="Update!"/>
 </form>
-
 </body>
 </html>

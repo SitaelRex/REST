@@ -7,33 +7,28 @@
 </head>
 <body>
 <div th:insert="header :: copy"></div>
-<form th:action="@{~/admin/}" th:method="POST" th:object="${user}">
+<form th:action="@{~/admin}" th:method="POST" th:object="${user}">
     <label for="name">Имя: </label>
     <input type="text" th:field="*{firstName}" id="name"/>
     <br/>
-
     <label for="name2">Фамилия: </label>
     <input type="text" th:field="*{lastName}" id="name2"/>
     <br/>
-
     <label for="username">Логин: </label>
     <input type="text" th:field="*{username}" id="username"/>
     <br/>
-
     <label for="password">Пароль: </label>
     <input type="text" th:field="*{password}" id="password"/>
     <br/>
-
     <label for="email">Электронная почта: </label>
     <input type="text" th:field="*{email}" id="email"/>
     <br/>
     <label for="group">Номер группы: </label>
-    <input type="number" step="1" onchange="this.value = Math.max(0, Math.min(20, parseInt(this.value)))" th:field="*{groupId}" id="group"/>
+    <input type="number" step="1" onchange="this.value = Math.max(0, Math.min(20, parseInt(this.value)))"
+           th:field="*{groupId}" id="group"/>
     <br/>
-
     <input type="submit" value="Создать!"/>
 </form>
-<a th:href="@{~/admin/}"> Вернуться</a>
-
+<a th:href="@{~/admin}"> Вернуться</a>
 </body>
 </html>

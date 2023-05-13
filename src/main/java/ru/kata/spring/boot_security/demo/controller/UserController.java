@@ -2,6 +2,11 @@ package ru.kata.spring.boot_security.demo.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -18,6 +23,7 @@ import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 @Controller
 public class UserController {
 
+
     private final UserServiceImpl userService;
 
     @Autowired
@@ -25,8 +31,21 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/admin/")
-    public String indexUsers(ModelMap model) {
+
+
+    private long getCurrentUserId(UserDetails currentUser){
+        User user = userService.getUser(currentUser.getUsername());
+        return  user.getId();
+    }
+
+    @GetMapping("/user")
+    public String redirectUser(ModelMap model,@AuthenticationPrincipal UserDetails currentUser) {
+        model.addAttribute("users", userService.getUsersList());
+        return "redirect:/user/"+getCurrentUserId(currentUser);
+    }
+
+    @GetMapping("/admin")
+    public String indexUsers(ModelMap model,@AuthenticationPrincipal UserDetails currentUser) {
         model.addAttribute("users", userService.getUsersList());
         return "users/index";
     }
@@ -43,10 +62,10 @@ public class UserController {
         return "users/new";
     }
 
-    @PostMapping("/admin/")
+    @PostMapping("/admin")
     public String createUser(@ModelAttribute("user") User user) {
         userService.saveUser(user);
-        return "redirect:/admin/";
+        return "redirect:/admin";
     }
 
     @GetMapping("/admin/{id}/edit")
@@ -58,12 +77,12 @@ public class UserController {
     @PatchMapping("/admin/{id}")
     public String updateUser(@ModelAttribute("user") User user, @PathVariable("id") int id) {
         userService.updateUser(id, user);
-        return "redirect:/admin/";
+        return "redirect:/admin";
     }
 
     @DeleteMapping("/admin/{id}")
     public String deleteUser(@PathVariable("id") int id) {
         userService.deleteUser(id);
-        return "redirect:/admin/";
+        return "redirect:/admin";
     }
 }
