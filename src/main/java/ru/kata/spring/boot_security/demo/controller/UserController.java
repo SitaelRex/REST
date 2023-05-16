@@ -40,13 +40,17 @@ public class UserController {
 
     @GetMapping("/user")
     public String redirectUser(ModelMap model,@AuthenticationPrincipal UserDetails currentUser) {
-        model.addAttribute("users", userService.getUsersList());
-        return "redirect:/user/"+getCurrentUserId(currentUser);
+       // model.addAttribute("users", userService.getUsersList());
+        User user = userService.getUser(currentUser.getUsername());
+        model.addAttribute("currentUser", user);
+        return "users/index"; //"redirect:/user/"+getCurrentUserId(currentUser);
     }
 
     @GetMapping("/admin")
     public String indexUsers(ModelMap model,@AuthenticationPrincipal UserDetails currentUser) {
+        User user = userService.getUser(currentUser.getUsername());
         model.addAttribute("users", userService.getUsersList());
+        model.addAttribute("currentUser", user);
         return "users/index";
     }
 
