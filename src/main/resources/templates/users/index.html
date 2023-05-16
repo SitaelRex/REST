@@ -57,7 +57,10 @@
        <li class="list-group-item rounded-0 border-0 bg-body text-white">With Roles</li>
    </ul>-->
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap  shadow">
-    <!--TODO заменить admin на информацию об админе + выделение жирным шрифтом эл.почты-->
+    <!--TODO заменить admin в шапке на информацию об админе + выделение жирным шрифтом эл.почты-->
+    <!--TODO подогнать класс user под отображение, добавить недостающие поля-->
+    <!--TODO сделать управление ролями из UI, начать с отображения, затем - все остальное-->
+    <!--TODO все надписи перевести на английский как в тз-->
     <ul class="list-group list-group-horizontal-sm ">
         <li class="list-group-item rounded-0 border-0 bg-body text-white fw-bold pr-0">Admin</li>
     </ul>
@@ -88,14 +91,13 @@
                     <div class="container mt-2">
                         <h1>Панель Администратора</h1>
                         <ul class="nav nav-tabs mt-4">
-                            <li class="nav-item"><a href="#home" class="nav-link active"
+                            <li class="nav-item"><a href="#userlist" class="nav-link active"
                                                     data-bs-toggle="tab">Список Пользователей</a></li>
-                            <li class="nav-item"><a href="#aboutus" class="nav-link"
+                            <li class="nav-item"><a href="#newuser" class="nav-link"
                                                     data-bs-toggle="tab">Новый пользователь</a></li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane fade show active" id="home">
-
+                            <div class="tab-pane fade show active" id="userlist">
                                 <ul class="list-group">
                                     <li class="list-group-item bg-transparent">
                                         <h3>Список пользователей</h3>
@@ -136,10 +138,13 @@
                                                     <a th:text="1"></a>
                                                 </td>
                                                 <td>
-                                                    <a th:text="1"></a>
+                                                    <a class="btn btn-success" th:href="@{~/admin/{id}/edit(id=${user.getId()})}" role="button">Edit</a>
                                                 </td>
                                                 <td>
-                                                    <a th:text="1"></a>
+                                                    <form th:method="DELETE" th:action="@{~/admin/{id}(id=${user.getId()})}">
+                                                        <input  class="btn btn-danger" type="submit" value="Delete"/>
+                                                    </form>
+                                                 <!--   <a class="btn btn-danger" href="#" role="button">Delete</a> -->
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -148,19 +153,56 @@
                                 </ul>
 
                             </div>
-                            <div class="tab-pane fade" id="aboutus">
-                                <h3>About Us tab</h3>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-                                    vel porta ex. Nam sit amet ex nec arcu consequat dictum eu nec
-                                    velit. Sed mattis euismod malesuada. Donec mattis nibh a nulla
-                                    dictum, in rutrum metus fringilla. Phasellus tincidunt euismod
-                                    pellentesque. Curabitur eget est sagittis, pellentesque libero nec,
-                                    ornare massa. Suspendisse non imperdiet sem, vel gravida odio.
-                                    Pellentesque diam dui, venenatis quis metus et, luctus accumsan
-                                    erat. Cras eget metus nisl. Vestibulum ante ipsum primis in
-                                    faucibus orci luctus et ultrices posuere cubilia curae; Fusce
-                                    tempor eget nisl id imperdiet. Cras ut convallis arcu, in tempor
-                                    libero.</p>
+                            <div class="tab-pane fade" id="newuser">
+                                <ul class="list-group">
+                                    <li class="list-group-item bg-transparent">
+                                        <h3>Add new user</h3>
+                                    </li>
+                                    <li class="list-group-item border-top">
+                                        <div class="container mt-4 mb-2">
+                                            <div class="row">
+                                                <div class="col-sm">
+
+                                                </div>
+                                                <div class="col-sm">
+                                                    <form th:action="@{~/admin}" th:method="POST" th:object="${newuser}">
+
+                                                        <label for="name" class="form-label">Имя: </label>
+                                                        <input type="text" class="form-control" th:field="*{firstName}" id="name"/>
+                                                        <br/>
+                                                        <label for="name2" class="form-label">Фамилия: </label>
+                                                        <input type="text" class="form-control" th:field="*{lastName}" id="name2"/>
+                                                        <br/>
+                                                        <label for="username" class="form-label">Логин: </label>
+                                                        <input type="text" class="form-control" th:field="*{username}" id="username"/>
+                                                        <br/>
+                                                        <label for="password" class="form-label">Пароль: </label>
+                                                        <input type="text" class="form-control" th:field="*{password}" id="password"/>
+                                                        <br/>
+                                                        <label for="email" class="form-label">Электронная почта: </label>
+                                                        <input type="text" class="form-control" th:field="*{email}" id="email"/>
+                                                        <br/>
+                                                        <label for="group" class="form-label">Номер группы: </label>
+                                                        <input type="number" step="1" onchange="this.value = Math.max(0, Math.min(20, parseInt(this.value)))"
+                                                               th:field="*{groupId}" id="group"/>
+                                                        <br/>
+                                                        <div class="d-grid gap-2 col-4 mx-auto">
+                                                            <button type="submit"  class="btn btn-success">Add new user</button>
+                                                        </div>
+
+                                                    </form>
+                                                </div>
+                                                <div class="col-sm">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </li>
+
+                                </ul>
+
+
                             </div>
                         </div>
                     </div>
@@ -170,7 +212,7 @@
                      th:classappend="${#authorization.expression('hasRole(''ROLE_ADMIN'')')} ? '' : 'active'">
                     <div class="container mt-2">
                         <h1>Страница Пользователя</h1>
-                        <ul class="list-group">
+                        <ul class="list-group mt-4">
                             <li class="list-group-item bg-transparent">
                                 <h3>О Пользователе</h3>
                             </li>

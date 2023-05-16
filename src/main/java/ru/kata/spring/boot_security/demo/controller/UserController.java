@@ -43,6 +43,8 @@ public class UserController {
        // model.addAttribute("users", userService.getUsersList());
         User user = userService.getUser(currentUser.getUsername());
         model.addAttribute("currentUser", user);
+        model.addAttribute("newuser", new User()); // без этого ломается (страница общая)
+        //TODO сделать newuser опциональным
         return "users/index"; //"redirect:/user/"+getCurrentUserId(currentUser);
     }
 
@@ -51,6 +53,7 @@ public class UserController {
         User user = userService.getUser(currentUser.getUsername());
         model.addAttribute("users", userService.getUsersList());
         model.addAttribute("currentUser", user);
+        model.addAttribute("newuser", new User());
         return "users/index";
     }
 
