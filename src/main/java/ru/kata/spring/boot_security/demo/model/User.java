@@ -22,6 +22,9 @@ public class User implements UserDetails {
     private short age;
     @Column(name = "username")
     private String username;
+
+    @Transient
+    private String buffPassword;
     @Column(name = "password")
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
@@ -89,6 +92,14 @@ public class User implements UserDetails {
 
     public void setAge(short age) {
         this.age = age;
+    }
+
+    public String getBuffPassword() {
+        return buffPassword;
+    }
+
+    public void setBuffPassword(String buffPassword) {
+        this.buffPassword = buffPassword;
     }
 
     @Override

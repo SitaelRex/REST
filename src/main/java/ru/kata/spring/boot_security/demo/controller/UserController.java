@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 
+import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,9 +17,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
+
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -32,14 +36,13 @@ public class UserController {
     }
 
 
-
-    private long getCurrentUserId(UserDetails currentUser){
+    private long getCurrentUserId(UserDetails currentUser) {
         User user = userService.getUser(currentUser.getUsername());
-        return  user.getId();
+        return user.getId();
     }
 
     @GetMapping("/user")
-    public String redirectUser(ModelMap model,@AuthenticationPrincipal UserDetails currentUser) {
+    public String redirectUser(ModelMap model, @AuthenticationPrincipal UserDetails currentUser) {
         User user = userService.getUser(currentUser.getUsername());
         model.addAttribute("currentUser", user);
         model.addAttribute("newuser", new User()); // без этого ломается (страница общая)
@@ -48,11 +51,16 @@ public class UserController {
     }
 
     @GetMapping("/admin")
-    public String indexUsers(ModelMap model,@AuthenticationPrincipal UserDetails currentUser) {
+    public String indexUsers(ModelMap model, @AuthenticationPrincipal UserDetails currentUser) {
         User user = userService.getUser(currentUser.getUsername());
         model.addAttribute("users", userService.getUsersList());
         model.addAttribute("currentUser", user);
         model.addAttribute("newuser", new User());
+        List<Role> roles = userService.getRoles();
+        model.addAttribute("rolesList", roles);
+        for (int i = 0; i < userService.getUsersList().size(); i++){
+            model.addAttribute("user["+i+"]", userService.getUsersList().get(i));
+        }
         return "users/index";
     }
 

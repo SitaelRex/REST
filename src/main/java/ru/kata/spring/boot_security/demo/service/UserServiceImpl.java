@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserDetailsService {
     @PersistenceContext
     private EntityManager entityManager;
     UserRepository userRepository;
+
     RoleRepository roleRepository;
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -39,13 +40,17 @@ public class UserServiceImpl implements UserDetailsService {
         roleRepository.save(new Role(2L, "ROLE_ADMIN"));
     }
 
+    public List<Role> getRoles() {
+        return roleRepository.findAll();
+    }
+
     @Transactional
     public void saveUser(ru.kata.spring.boot_security.demo.model.User user) {
         ru.kata.spring.boot_security.demo.model.User userFromDB = userRepository.findByUsername(user.getUsername());
         if (userFromDB != null) {
             return;
         }
-        user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
+        // user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
@@ -75,6 +80,12 @@ public class UserServiceImpl implements UserDetailsService {
         entityManager.detach(userFromDb);
         userFromDb.setFirstName(newUser.getFirstName());
         userFromDb.setLastName(newUser.getLastName());
+        userFromDb.setAge(newUser.getAge());
+        userFromDb.setUsername(newUser.getUsername());
+        if (newUser.getBuffPassword() != null && newUser.getBuffPassword().length() > 0) {
+            userFromDb.setPassword(bCryptPasswordEncoder.encode(newUser.getBuffPassword()));
+        }
+        userFromDb.setRoles(newUser.getRoles());
         entityManager.merge(userFromDb);
     }
 
