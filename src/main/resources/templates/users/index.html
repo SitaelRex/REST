@@ -46,6 +46,10 @@
             padding-top: 10px;
         }
 
+        .inline {
+            display: inline;
+        }
+
         body, html {
             overflow-x: hidden;
         }
@@ -57,12 +61,16 @@
        <li class="list-group-item rounded-0 border-0 bg-body text-white">With Roles</li>
    </ul>-->
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap  shadow">
-    <!--TODO заменить admin в шапке на информацию об админе + выделение жирным шрифтом эл.почты-->
     <!--TODO подогнать класс user под отображение, добавить недостающие поля-->
     <!--TODO сделать управление ролями из UI, начать с отображения, затем - все остальное-->
+    <!--TODO модальные окна-->
     <!--TODO все надписи перевести на английский как в тз-->
     <ul class="list-group list-group-horizontal-sm ">
-        <li class="list-group-item rounded-0 border-0 bg-body text-white fw-bold pr-0">Admin</li>
+        <li class="list-group-item rounded-0 border-0 bg-body text-white pr-0">
+            <p class="fw-bold inline" th:text="${currentUser.getUsername()}"></p>
+            <p  class="fw-normal inline"> with roles: </p>
+            <p class="fw-normal inline" th:text="${currentUser.getRolesString()}"></p>
+        </li>
     </ul>
     <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
@@ -117,33 +125,81 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr th:each="user : ${users}">
+                                            <tr th:each="user,status : ${users}">
+
+
+
+                                                <td>
+                                                    <a th:text="${user.getId()}"></a>
+
+                                                </td>
                                                 <td>
                                                     <a th:text="${user.getFirstName()}"></a>
-                                                    <!!--th:href="@{~/user/{id}(id=${user.getId()})}"
                                                 </td>
                                                 <td>
                                                     <a th:text="${user.getLastName()}"></a>
                                                 </td>
                                                 <td>
-                                                    <a th:text="${user.getGroupId()}"></a>
+                                                    <a th:text="${user.getAge()}"></a>
                                                 </td>
                                                 <td>
-                                                    <a th:text="1"></a>
+                                                    <a th:text="${user.getUsername()}"></a>
                                                 </td>
                                                 <td>
-                                                    <a th:text="1"></a>
+                                                    <a th:text="${user.getRolesString()}"></a>
                                                 </td>
                                                 <td>
-                                                    <a th:text="1"></a>
+                                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" th:data-bs-target="'#editModal'+${status.index}">
+                                                        Edit
+                                                    </button>
+
+                                                    <!-- Модальное окно Edit     <a class="btn btn-success" th:href="@{~/admin/{id}/edit(id=${user.getId()})}" role="button">Edit</a>    -->
+                                                    <div class="modal fade" th:id="'editModal'+${status.index}" tabindex="-1">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="exampleModalLabel">Заголовок модального окна</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <a th:text="${user.getId()}"
+                                                                       target="_blank"></a>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                                    <button type="button" class="btn btn-primary">Сохранить изменения</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <a class="btn btn-success" th:href="@{~/admin/{id}/edit(id=${user.getId()})}" role="button">Edit</a>
-                                                </td>
-                                                <td>
-                                                    <form th:method="DELETE" th:action="@{~/admin/{id}(id=${user.getId()})}">
-                                                        <input  class="btn btn-danger" type="submit" value="Delete"/>
-                                                    </form>
+                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" th:data-bs-target="'#deleteModal'+${status.index}">
+                                                        Delete
+                                                    </button>
+
+                                                    <!-- Модальное окно Delete  -->
+                                                    <div th:fragment="modal" class="modal fade" th:id="'deleteModal'+${status.index}" tabindex="-1">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="deleteModalLabel">Заголовок модального окна</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <a th:text="${user.getId()}"
+                                                                       target="_blank"></a>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                                    <form th:method="DELETE" th:action="@{~/admin/{id}(id=${user.getId()})}">
+                                                                        <input  class="btn btn-danger" type="submit" value="Delete"/>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
                                                  <!--   <a class="btn btn-danger" href="#" role="button">Delete</a> -->
                                                 </td>
                                             </tr>
@@ -167,25 +223,23 @@
                                                 <div class="col-sm">
                                                     <form th:action="@{~/admin}" th:method="POST" th:object="${newuser}">
 
-                                                        <label for="name" class="form-label">Имя: </label>
+                                                        <label for="name" class="form-label">First name: </label>
                                                         <input type="text" class="form-control" th:field="*{firstName}" id="name"/>
                                                         <br/>
-                                                        <label for="name2" class="form-label">Фамилия: </label>
+                                                        <label for="name2" class="form-label">Last name: </label>
                                                         <input type="text" class="form-control" th:field="*{lastName}" id="name2"/>
                                                         <br/>
-                                                        <label for="username" class="form-label">Логин: </label>
-                                                        <input type="text" class="form-control" th:field="*{username}" id="username"/>
+                                                        <label for="age" class="form-label">Age: </label>
+                                                        <input type="number" class="form-control" step="1" onchange="this.value = Math.max(0, Math.min(140, parseInt(this.value)))" th:field="*{age}" id="age"/>
                                                         <br/>
-                                                        <label for="password" class="form-label">Пароль: </label>
-                                                        <input type="text" class="form-control" th:field="*{password}" id="password"/>
+                                                        <label for="username" class="form-label">Email: </label>
+                                                        <input type="email" class="form-control" th:field="*{username}" id="username"/>
                                                         <br/>
-                                                        <label for="email" class="form-label">Электронная почта: </label>
-                                                        <input type="text" class="form-control" th:field="*{email}" id="email"/>
+                                                        <label for="password" class="form-label">Password: </label>
+                                                        <input type="password" class="form-control" th:field="*{password}" id="password"/>
                                                         <br/>
-                                                        <label for="group" class="form-label">Номер группы: </label>
-                                                        <input type="number" step="1" onchange="this.value = Math.max(0, Math.min(20, parseInt(this.value)))"
-                                                               th:field="*{groupId}" id="group"/>
-                                                        <br/>
+
+
                                                         <div class="d-grid gap-2 col-4 mx-auto">
                                                             <button type="submit"  class="btn btn-success">Add new user</button>
                                                         </div>
@@ -226,18 +280,24 @@
                                         <th>Возраст</th>
                                         <th>Почта</th>
                                         <th>Роли</th>
-                                        <th>Изменить</th>
-                                        <th>Удалить</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr>
-                                        <th scope="row">
+                                        <td><a th:text="${currentUser.getId()}"
+                                               target="_blank"></a></td>
                                         <td><a th:text="${currentUser.getFirstName()}"
                                                target="_blank"></a></td>
                                         <td><a th:text="${currentUser.getLastName()}"
                                                target="_blank"></a></td>
+                                        <td><a th:text="${currentUser.getAge()}"
+                                               target="_blank"></a></td>
+                                        </th>
                                         <td><a th:text="${currentUser.getUsername()}"
+                                               target="_blank"></a></td>
+                                        </th>
+
+                                        <td><a th:text="${ currentUser.getRolesString()}"
                                                target="_blank"></a></td>
                                         </th>
                                     </tr>

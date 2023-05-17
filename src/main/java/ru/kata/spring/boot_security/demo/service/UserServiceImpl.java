@@ -73,8 +73,6 @@ public class UserServiceImpl implements UserDetailsService {
     public void updateUser(long id, ru.kata.spring.boot_security.demo.model.User newUser) {
         ru.kata.spring.boot_security.demo.model.User userFromDb = getUser(id);
         entityManager.detach(userFromDb);
-        userFromDb.setEmail(newUser.getEmail());
-        userFromDb.setGroupId(newUser.getGroupId());
         userFromDb.setFirstName(newUser.getFirstName());
         userFromDb.setLastName(newUser.getLastName());
         entityManager.merge(userFromDb);

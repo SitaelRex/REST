@@ -57,8 +57,6 @@ public class UserDaoImpl implements UserDao {
     public void updateUser(long id, User newUser) {
         User user = getUser(id);
         entityManager.detach(user);
-        user.setEmail(newUser.getEmail());
-        user.setGroupId(newUser.getGroupId());
         user.setFirstName(newUser.getFirstName());
         user.setLastName(newUser.getLastName());
         entityManager.merge(user);

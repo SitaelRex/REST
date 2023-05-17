@@ -18,17 +18,14 @@ public class User implements UserDetails {
     private String firstName;
     @Column(name = "lastName")
     private String lastName;
-
+    @Column(name = "age")
+    private short age;
     @Column(name = "username")
     private String username;
     @Column(name = "password")
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
-    @Column(name = "groupId")
-    private int groupId;
-    @Column(name = "email")
-    private String email;
 
     public User() {
     }
@@ -60,6 +57,11 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
+    public String getRolesString() {
+        String roleString = getRoles().toString();
+        return roleString.substring(1,roleString.length()-1).replace(",","");
+    }
+
     public Long getId() {
         return id;
     }
@@ -80,20 +82,13 @@ public class User implements UserDetails {
         this.lastName = lastName;
     }
 
-    public int getGroupId() {
-        return groupId;
+
+    public short getAge() {
+        return age;
     }
 
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setAge(short age) {
+        this.age = age;
     }
 
     @Override

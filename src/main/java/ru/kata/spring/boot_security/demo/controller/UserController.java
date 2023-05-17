@@ -40,7 +40,6 @@ public class UserController {
 
     @GetMapping("/user")
     public String redirectUser(ModelMap model,@AuthenticationPrincipal UserDetails currentUser) {
-       // model.addAttribute("users", userService.getUsersList());
         User user = userService.getUser(currentUser.getUsername());
         model.addAttribute("currentUser", user);
         model.addAttribute("newuser", new User()); // без этого ломается (страница общая)
