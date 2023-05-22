@@ -11,7 +11,7 @@
     <title>AllUsersList</title>
 
     <script
-            src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+            src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
     <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
@@ -124,7 +124,8 @@
                                                 <th>Delete</th>
                                             </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody id="allUsersTable">
+                                            <!--
                                             <tr th:each="user,status : ${users}">
 
 
@@ -153,7 +154,7 @@
                                                         Edit
                                                     </button>
 
-                                                    <!-- Модальное окно Edit     -->
+                                                    < !-- Модальное окно Edit     -- >
                                                     <div class="modal fade" th:id="'editModal'+${status.index}"
                                                          tabindex="-1">
                                                         <div class="modal-dialog">
@@ -241,7 +242,7 @@
                                                         Delete
                                                     </button>
 
-                                                    <!-- Модальное окно Delete  -->
+                                                    <! -- Модальное окно Delete  -- >
                                                     <div th:fragment="modal" class="modal fade"
                                                          th:id="'deleteModal'+${status.index}" tabindex="-1">
                                                         <div class="modal-dialog">
@@ -322,8 +323,45 @@
 
                                                 </td>
                                             </tr>
+                                            -->
                                             </tbody>
                                         </table>
+                                        <script>
+                                            var myArray = []
+                                            $.ajax({
+                                                method:'GET',
+                                                url:'http://localhost:8080/api/users',
+                                                success:function (response) {
+                                                    myArray = response
+                                                    console.log(myArray)
+                                                    buildTable(myArray)
+
+                                                }
+                                            })
+
+
+
+                                            function buildTable(data){
+                                                var table = document.getElementById('allUsersTable')
+
+
+
+                                                for (var i = 0; i < data.length; i++){
+                                                    var roleNames = data[i].roles.map(function(role) {
+                                                        return role['name'].replace('ROLE_','');
+                                                    }).join(' ')
+
+                                                    var row = "<tr><td>"+data[i].id
+                                                        +"</td><td>"+data[i].firstName
+                                                        +"</td><td>"+data[i].lastName+"</td><td>"+data[i].age
+                                                        +"</td><td>"+data[i].username
+                                                        +"</td><td>"+roleNames
+                                                        +"</td><td>Edit</td><td>Delete</td></tr>"
+                                                        table.innerHTML += row
+                                                }
+                                            }
+                                        </script>
+
                                     </li>
                                 </ul>
 
