@@ -128,40 +128,27 @@
                                             </tbody>
                                         </table>
                                         <script type="module">
-                                            var myArray = []
                                             let url = 'http://localhost:8080/api/users';
                                             let response = await fetch(url);
                                             let users = await response.json();
                                             buildTable(users);
-                                           // $.ajax({
-                                           //     method:'GET',
-                                           //     url:'http://localhost:8080/api/users',
-                                          //      success:function (response) {
-                                          //          myArray = response
-                                         //           console.log(myArray)
-                                          //          buildTable(myArray)
-                                          //      }
-                                          //  })
 
-
-
-                                            function buildTable(data){
+                                            function buildTable(data) {
                                                 var table = document.getElementById('allUsersTable')
 
 
-
-                                                for (var i = 0; i < data.length; i++){
-                                                    var roleNames = data[i].roles.map(function(role) {
-                                                        return role['name'].replace('ROLE_','');
+                                                for (var i = 0; i < data.length; i++) {
+                                                    var roleNames = data[i].roles.map(function (role) {
+                                                        return role['name'].replace('ROLE_', '');
                                                     }).join(' ')
 
-                                                    var row = "<tr><td>"+data[i].id
-                                                        +"</td><td>"+data[i].firstName
-                                                        +"</td><td>"+data[i].lastName+"</td><td>"+data[i].age
-                                                        +"</td><td>"+data[i].username
-                                                        +"</td><td>"+roleNames
-                                                        +"</td><td>Edit</td><td>Delete</td></tr>"
-                                                        table.innerHTML += row
+                                                    var row = "<tr><td>" + data[i].id
+                                                        + "</td><td>" + data[i].firstName
+                                                        + "</td><td>" + data[i].lastName + "</td><td>" + data[i].age
+                                                        + "</td><td>" + data[i].username
+                                                        + "</td><td>" + roleNames
+                                                        + "</td><td>Edit</td><td>Delete</td></tr>"
+                                                    table.innerHTML += row
                                                 }
                                             }
                                         </script>
@@ -258,27 +245,33 @@
                                         <th>Role</th>
                                     </tr>
                                     </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td><a th:text="${currentUser.getId()}"
-                                               target="_blank"></a></td>
-                                        <td><a th:text="${currentUser.getFirstName()}"
-                                               target="_blank"></a></td>
-                                        <td><a th:text="${currentUser.getLastName()}"
-                                               target="_blank"></a></td>
-                                        <td><a th:text="${currentUser.getAge()}"
-                                               target="_blank"></a></td>
-                                        </th>
-                                        <td><a th:text="${currentUser.getUsername()}"
-                                               target="_blank"></a></td>
-                                        </th>
-
-                                        <td><a th:text="${ currentUser.getRolesString()}"
-                                               target="_blank"></a></td>
-                                        </th>
-                                    </tr>
+                                    <tbody id="userInfo">
                                     </tbody>
                                 </table>
+                                <script type="module" th:inline="javascript">
+                                    /*[+
+                                    let url = 'http://localhost:8080/api/users/'+ [[${currentUser.getId()}]]
+                                    +]*/;
+                                    // <![CDATA[
+                                    let response = await fetch(url);
+                                    let data = await response.json();
+                                    console.log(data)
+                                    var table = document.getElementById('userInfo')
+
+                                    var roleNames = data.roles.map(function (role) {
+                                        return role['name'].replace('ROLE_', '');
+                                    }).join(' ')
+
+                                    var row = "<tr><td>" + data.id
+                                        + "</td><td>" + data.firstName
+                                        + "</td><td>" + data.lastName
+                                        + "</td><td>" + data.age
+                                        + "</td><td>" + data.username
+                                        + "</td><td>" + roleNames
+                                        + "</td></tr>"
+                                    table.innerHTML += row
+                                    // ]]>
+                                </script>
                             </li>
                         </ul>
                     </div>
