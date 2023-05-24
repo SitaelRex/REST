@@ -15,23 +15,44 @@
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
             crossorigin="anonymous"></script>
-    <script th:inline="javascript">
+    <script>
         updateModule = {
+            async getCurrentUserInfo() {
+                let url = 'http://localhost:8080/api/currentuser';
+                let response = await fetch(url);
+                let data = await response.json();
+                return data.id;
+            },
 
             async getCurrentUser() {
                 let url = 'http://localhost:8080/api/currentuser';
                 let response = await fetch(url);
                 let data = await response.json();
-
-
                 var roleNames = data.roles.map(function (role) {
                     return role['name'].replace('ROLE_', '');
                 }).join(' ').split(' ').sort().join(' ')
 
                 document.getElementById("headerUsername").innerHTML = data.username
                 document.getElementById("headerRoles").innerHTML = roleNames
-                //id = "headerUsername"; id = "headerRoles"
-               // console.log(currentUserInfo);
+                if ( roleNames.includes("ADMIN") ) {
+                    document.getElementById("adminTab").className = "nav-link active"
+                    document.getElementById("userTab").className = "nav-link"
+                    document.getElementById("admin").className = "tab-pane fade active show"
+                    document.getElementById("user").className = "tab-pane fade"
+                    document.getElementById("adminTabItem").className = "nav-item flex-fill"
+                } else {
+                    document.getElementById("adminTab").className = "nav-link"
+                    document.getElementById("userTab").className = "nav-link active"
+                    document.getElementById("user").className = "tab-pane fade active show"
+                    document.getElementById("admin").className = "tab-pane fade d-none"
+                    document.getElementById("adminTabItem").className = "nav-item flex-fill d-none"
+                }
+
+                if ( roleNames.includes("USER") ) {
+                    document.getElementById("userTabItem").className = "nav-item flex-fill"
+                } else {
+                    document.getElementById("userTabItem").className = "nav-item flex-fill d-none"
+                }
             },
             async updateAllUsers() {
                 let url = 'http://localhost:8080/api/users';
@@ -89,7 +110,7 @@
                         + "</td><td>" + data[i].username
                         + "</td><td>" + roleNames.split(' ').sort().join(' ')
                         + "</td><td>" +
-                        '<a id="editButton' + data[i].id + '"class="btn btn-info" data-bs-toggle="modal" data-bs-target="#editModal"'
+                        '<a id="editButton' + data[i].id + '"class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editModal"'
                         + ' data-editid="' + data[i].id
                         + '" data-editname="' + data[i].firstName
                         + '" data-editlastname="' + data[i].lastName
@@ -113,11 +134,8 @@
                 }
             },
             async userUpdate() {
-                /*[+
-            let url = 'http://localhost:8080/api/users/'+ [[${currentUser.getId()}]]
-            +]*/
-                ;
-                // <![CDATA[
+                let id = await this.getCurrentUserInfo()
+                let url = 'http://localhost:8080/api/users/' + id
                 let response = await fetch(url);
                 let data = await response.json();
                 var table = document.getElementById('userInfo')
@@ -133,10 +151,8 @@
                     + "</td><td>" + roleNames
                     + "</td></tr>"
                 table.innerHTML += row
-                // ]]>
             },
         }
-        //updateModule.getCurrentUser();
     </script>
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
@@ -153,20 +169,25 @@
             padding: 0;
             /*background-color: yellow;*/
         }
+
         .container-fluid {
             flex: 1;
             padding: 0;
         }
+
         .nav-pills {
             width: 100%;
         }
+
         .col-2 {
             padding-right: 0;
             padding-top: 10px;
         }
+
         .inline {
             display: inline;
         }
+
         body, html {
             overflow-x: hidden;
         }
@@ -362,9 +383,9 @@
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap  shadow">
     <ul class="list-group list-group-horizontal-sm ">
         <li class="list-group-item rounded-0 border-0 bg-body text-white pr-0">
-            <p class="fw-bold inline" id = "headerUsername">aaa</p>
+            <p class="fw-bold inline" id="headerUsername">aaa</p>
             <p class="fw-normal inline"> with roles: </p>
-            <p class="fw-normal inline" id = "headerRoles">bbb</p>
+            <p class="fw-normal inline" id="headerRoles">bbb</p>
         </li>
     </ul>
     <ul class="navbar-nav px-3">
@@ -377,20 +398,17 @@
     <div class="row flex-fill d-flex">
         <div class="col-2">
             <ul class="nav nav-pills flex-column" id="v-pills-tab" role="navigation" aria-orientation="vertical">
-                <li class="nav-item flex-fill" sec:authorize="hasRole('ADMIN')"><a href="#admin" class="nav-link"
-                                                                                   th:classappend="${#authorization.expression('hasRole(''ROLE_ADMIN'')')} ? active : ''"
+                <li class="nav-item flex-fill d-none" id="adminTabItem"><a id="adminTab" href="#admin" class="nav-link"
                                                                                    data-bs-toggle="tab">Admin</a></li>
-                <li class="nav-item flex-fill" sec:authorize="hasRole('USER')"><a href="#user" class="nav-link"
-                                                                                  th:classappend="${#authorization.expression('hasRole(''ROLE_ADMIN'')')} ? '' : active"
+                <li class="nav-item flex-fill d-none" id="userTabItem" ><a  id="userTab" href="#user" class="nav-link"
                                                                                   data-bs-toggle="tab">User</a>
                 </li>
             </ul>
         </div>
         <div class="col-10 bg-light">
             <div class="tab-content" id="v-pills-tabContent">
-                <div class="tab-pane fade show active" id="admin"
-                     th:classappend="${#authorization.expression('hasRole(''ROLE_ADMIN'')')} ? '' : 'd-none'">
-                    <div class="container mt-2" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <div class="tab-pane fade show active" id="admin">
+                    <div class="container mt-2">
                         <h1>Admin panel</h1>
                         <ul class="nav nav-tabs mt-4">
                             <li class="nav-item"><a href="#userlist" class="nav-link active"
@@ -488,7 +506,6 @@
                                                                 password: $("#newForm #password").val(),
                                                                 roles: JSON.parse("[" + $("#newForm #roles").val() + "]")
                                                             }
-                                                            //console.log(JSON.stringify(newUser))
                                                             let url = 'http://localhost:8080/api/users'
                                                             let response = await fetch(url, {
                                                                 method: 'POST',
@@ -512,8 +529,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade show" id="user"
-                     th:classappend="${#authorization.expression('hasRole(''ROLE_ADMIN'')')} ? '' : 'active'">
+                <div class="tab-pane fade show" id="user">
                     <div class="container mt-2">
                         <h1>User information-page</h1>
                         <ul class="list-group mt-4">
