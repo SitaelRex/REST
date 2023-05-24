@@ -19,13 +19,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 @Service
 public class UserServiceImpl implements UserDetailsService {
     @PersistenceContext
     private EntityManager entityManager;
     UserRepository userRepository;
-
     RoleRepository roleRepository;
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -35,7 +33,6 @@ public class UserServiceImpl implements UserDetailsService {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        //ручная инициализация ролей в БД для связи с пользователями
         roleRepository.save(new Role(1L, "ROLE_USER"));
         roleRepository.save(new Role(2L, "ROLE_ADMIN"));
     }
@@ -50,7 +47,6 @@ public class UserServiceImpl implements UserDetailsService {
         if (userFromDB != null) {
             return;
         }
-        // user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }

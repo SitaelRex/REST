@@ -25,8 +25,7 @@ import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 import java.util.List;
 
 @Controller
-public class UserController {
-
+public class UserController { //не понял как передать информацию об аутентефикации на страницу без модели, поэтому
 
     private final UserServiceImpl userService;
 
@@ -35,68 +34,17 @@ public class UserController {
         this.userService = userService;
     }
 
-
-    private long getCurrentUserId(UserDetails currentUser) {
-        User user = userService.getUser(currentUser.getUsername());
-        return user.getId();
-    }
-
     @GetMapping("/user")
     public String redirectUser(ModelMap model, @AuthenticationPrincipal UserDetails currentUser) {
         User user = userService.getUser(currentUser.getUsername());
         model.addAttribute("currentUser", user);
-        model.addAttribute("newuser", new User()); // без этого ломается (страница общая)
-        //TODO сделать newuser опциональным
-        return "users/index"; //"redirect:/user/"+getCurrentUserId(currentUser);
+        return "users/index";
     }
 
     @GetMapping("/admin")
     public String indexUsers(ModelMap model, @AuthenticationPrincipal UserDetails currentUser) {
         User user = userService.getUser(currentUser.getUsername());
-        model.addAttribute("users", userService.getUsersList());
         model.addAttribute("currentUser", user);
-        model.addAttribute("newuser", new User());
-        List<Role> roles = userService.getRoles();
-        model.addAttribute("rolesList", roles);
-        for (int i = 0; i < userService.getUsersList().size(); i++){
-            model.addAttribute("user["+i+"]", userService.getUsersList().get(i));
-        }
         return "users/index";
-    }
-
-    @GetMapping("/user/{id}")
-    public String showUser(@PathVariable("id") int id, ModelMap model) {
-        model.addAttribute("user", userService.getUser(id));
-        return "users/show";
-    }
-
-    @GetMapping("/admin/new")
-    public String newUser(ModelMap model) {
-        model.addAttribute("user", new User());
-        return "users/new";
-    }
-
-    @PostMapping("/admin")
-    public String createUser(@ModelAttribute("user") User user) {
-        userService.saveUser(user);
-        return "redirect:/admin";
-    }
-
-    @GetMapping("/admin/{id}/edit")
-    public String editUser(ModelMap model, @PathVariable("id") int id) {
-        model.addAttribute("user", userService.getUser(id));
-        return "users/edit";
-    }
-
-    @PatchMapping("/admin/{id}")
-    public String updateUser(@ModelAttribute("user") User user, @PathVariable("id") int id) {
-        userService.updateUser(id, user);
-        return "redirect:/admin";
-    }
-
-    @DeleteMapping("/admin/{id}")
-    public String deleteUser(@PathVariable("id") int id) {
-        userService.deleteUser(id);
-        return "redirect:/admin";
     }
 }

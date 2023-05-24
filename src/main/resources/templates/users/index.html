@@ -3,7 +3,6 @@
 <html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -16,6 +15,129 @@
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
             crossorigin="anonymous"></script>
+    <script th:inline="javascript">
+        updateModule = {
+
+            async getCurrentUser() {
+                let url = 'http://localhost:8080/api/currentuser';
+                let response = await fetch(url);
+                let data = await response.json();
+
+
+                var roleNames = data.roles.map(function (role) {
+                    return role['name'].replace('ROLE_', '');
+                }).join(' ').split(' ').sort().join(' ')
+
+                document.getElementById("headerUsername").innerHTML = data.username
+                document.getElementById("headerRoles").innerHTML = roleNames
+                //id = "headerUsername"; id = "headerRoles"
+               // console.log(currentUserInfo);
+            },
+            async updateAllUsers() {
+                let url = 'http://localhost:8080/api/users';
+                let response = await fetch(url);
+                let users = await response.json();
+                document.getElementById('deleteModal').addEventListener('show.bs.modal', (e) => {
+                    var deleteid = e.relatedTarget.dataset.deleteid
+                    var deletename = e.relatedTarget.dataset.deletename
+                    var deletelastname = e.relatedTarget.dataset.deletelastname
+                    var deleteage = e.relatedTarget.dataset.deleteage
+                    var deleteusername = e.relatedTarget.dataset.deleteusername
+                    var deleteroles = e.relatedTarget.dataset.deleteroles
+                    $(".modal-body #delete-id").val(deleteid);
+                    $(".modal-body #delete-name").val(deletename);
+                    $(".modal-body #delete-lastname").val(deletelastname);
+                    $(".modal-body #delete-age").val(deleteage);
+                    $(".modal-body #delete-username").val(deleteusername);
+                    $(".modal-body #delete-roles").val(deleteroles);
+                    $("#deleteButton").data('id', deleteid)
+                });
+                document.getElementById('editModal').addEventListener('show.bs.modal', (e) => {
+                    var editid = e.relatedTarget.dataset.editid
+                    var editname = e.relatedTarget.dataset.editname
+                    var editlastname = e.relatedTarget.dataset.editlastname
+                    var editage = e.relatedTarget.dataset.editage
+                    var editusername = e.relatedTarget.dataset.editusername
+                    var editroles = e.relatedTarget.dataset.editroles
+                    $(".modal-body #edit-id").val(editid);
+                    $(".modal-body #edit-name").val(editname);
+                    $(".modal-body #edit-lastname").val(editlastname);
+                    $(".modal-body #edit-age").val(editage);
+                    $(".modal-body #edit-username").val(editusername);
+                    $(".modal-body #edit-roles").val(editroles);
+                    // $(".modal-body #edit-roles").val(JSON.parse(editroles.replace("'","\""))); //editroles
+                    if (editroles.includes("USER")) {
+                        $('option:contains("USER")').prop('selected', true);
+                    }
+                    if (editroles.includes("ADMIN")) {
+                        $('option:contains("ADMIN")').prop('selected', true);
+                    }
+                });
+                this.buildTable(users);
+                this.getCurrentUser();
+            },
+            buildTable(data) {
+                var table = document.getElementById('allUsersTable')
+                table.innerHTML = ""
+                for (var i = 0; i < data.length; i++) {
+                    var roleNames = data[i].roles.map(function (role) {
+                        return role['name'].replace('ROLE_', '');
+                    }).join(' ')
+                    var row = "<tr><td>" + data[i].id
+                        + "</td><td>" + data[i].firstName
+                        + "</td><td>" + data[i].lastName + "</td><td>" + data[i].age
+                        + "</td><td>" + data[i].username
+                        + "</td><td>" + roleNames.split(' ').sort().join(' ')
+                        + "</td><td>" +
+                        '<a id="editButton' + data[i].id + '"class="btn btn-info" data-bs-toggle="modal" data-bs-target="#editModal"'
+                        + ' data-editid="' + data[i].id
+                        + '" data-editname="' + data[i].firstName
+                        + '" data-editlastname="' + data[i].lastName
+                        + '" data-editage="' + data[i].age
+                        + '" data-editusername="' + data[i].username
+                        + '" data-editroles="' + roleNames +
+                        '"> Edit' +
+                        '</a>'
+                        + "</td><td>" +
+                        '<a id="button' + data[i].id + '"class="btn btn-danger " data-bs-toggle="modal" data-bs-target="#deleteModal"'
+                        + ' data-deleteid="' + data[i].id
+                        + '" data-deletename="' + data[i].firstName
+                        + '" data-deletelastname="' + data[i].lastName
+                        + '" data-deleteage="' + data[i].age
+                        + '" data-deleteusername="' + data[i].username
+                        + '" data-deleteroles="' + roleNames +
+                        '"> Delete'
+                    '</a>' +
+                    "</td></tr>"
+                    table.innerHTML += row
+                }
+            },
+            async userUpdate() {
+                /*[+
+            let url = 'http://localhost:8080/api/users/'+ [[${currentUser.getId()}]]
+            +]*/
+                ;
+                // <![CDATA[
+                let response = await fetch(url);
+                let data = await response.json();
+                var table = document.getElementById('userInfo')
+                table.innerHTML = ""
+                var roleNames = data.roles.map(function (role) {
+                    return role['name'].replace('ROLE_', '');
+                }).join(' ')
+                var row = "<tr><td>" + data.id
+                    + "</td><td>" + data.firstName
+                    + "</td><td>" + data.lastName
+                    + "</td><td>" + data.age
+                    + "</td><td>" + data.username
+                    + "</td><td>" + roleNames
+                    + "</td></tr>"
+                table.innerHTML += row
+                // ]]>
+            },
+        }
+        //updateModule.getCurrentUser();
+    </script>
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -31,45 +153,218 @@
             padding: 0;
             /*background-color: yellow;*/
         }
-
         .container-fluid {
             flex: 1;
             padding: 0;
         }
-
         .nav-pills {
             width: 100%;
         }
-
         .col-2 {
             padding-right: 0;
             padding-top: 10px;
         }
-
         .inline {
             display: inline;
         }
-
         body, html {
             overflow-x: hidden;
         }
     </style>
 </head>
 <body>
-<!--<div th:insert="header :: copy"></div>  <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">1Company name</a>   <ul class="list-group list-group-horizontal-sm ">
-       <li class="list-group-item rounded-0 border-0 bg-body text-white fw-bold pr-0" style="padding-right: 0%">Admin</li>
-       <li class="list-group-item rounded-0 border-0 bg-body text-white">With Roles</li>
-   </ul>-->
+<!-- Modal Delete-->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    Delete user</h5>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <label for="delete-id"
+                       class="form-label">Id: </label>
+                <input type="number" class="form-control"
+                       field="0"
+                       id="delete-id" name="id" disabled
+                       readonly/>
+                <br/>
+                <label for="delete-name" class="form-label">First
+                    name: </label>
+                <input type="text" class="form-control"
+                       field="0"
+                       id="delete-name" name="firstname" disabled
+                       readonly/>
+                <br/>
+                <label for="delete-lastname" class="form-label">Last
+                    name: </label>
+                <input type="text" class="form-control"
+                       field="0"
+                       id="delete-lastname" name="lastname" disabled
+                       readonly/>
+                <br/>
+                <label for="delete-age"
+                       class="form-label">Age: </label>
+                <input type="number" class="form-control"
+                       step="1"
+                       onchange="this.value = Math.max(0, Math.min(140, parseInt(this.value)))"
+                       field="0"
+                       id="delete-age" name="age" disabled
+                       readonly/>
+                <br/>
+                <label for="delete-username" class="form-label">Email: </label>
+                <input type="email" class="form-control"
+                       field="0"
+                       id="delete-username" disabled
+                       readonly/>
+                <br/>
+                <div class="form-group">
+                    <label for="delete-roles">Role</label>
+                    <select class="form-select"
+                            size=2
+                            field="0"
+                            id="delete-roles" multiple="multiple" disabled
+                            readonly>
+                        <option value="1">USER</option>
+                        <option value="2">ADMIN</option>
+                    </select>
+                </div>
+                <br/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Close
+                </button>
+                <button id="deleteButton" type="button" class="btn btn-danger"
+                        data-bs-dismiss="modal">Delete
+                </button>
+            </div>
+            <script type="module">
+                document.getElementById("deleteButton").onclick = async function () {
+                    //alert($("#exampleModal #delete-id").val());
+                    let url = 'http://localhost:8080/api/users/' + $("#deleteModal #delete-id").val();
+                    let response = await fetch(url, {method: 'DELETE'});
+                    let result = await response.text();
+                    await updateModule.updateAllUsers()
+                };
+            </script>
+        </div>
+    </div>
+</div>
+<!-- Modal Edit-->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">
+                    Edit user</h5>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <label for="edit-id"
+                       class="form-label">Id: </label>
+                <input type="number" class="form-control"
+                       field="0"
+                       id="edit-id" name="id"
+                       readonly/>
+                <br/>
+                <label for="edit-name" class="form-label">First
+                    name: </label>
+                <input type="text" class="form-control"
+                       field="0"
+                       id="edit-name" name="firstname"
+                />
+                <br/>
+                <label for="edit-lastname" class="form-label">Last
+                    name: </label>
+                <input type="text" class="form-control"
+                       field="0"
+                       id="edit-lastname" name="lastname"
+                />
+                <br/>
+                <label for="edit-age"
+                       class="form-label">Age: </label>
+                <input type="number" class="form-control"
+                       step="1"
+                       onchange="this.value = Math.max(0, Math.min(140, parseInt(this.value)))"
+                       field="0"
+                       id="edit-age" name="age"
+                />
+                <br/>
+                <label for="edit-username" class="form-label">Email: </label>
+                <input type="email" class="form-control"
+                       field="0"
+                       id="edit-username"
+                />
+                <br/>
+
+                <label for="edit-password" class="form-label">Password: </label>
+                <input type="password" class="form-control"
+                       field="0"
+                       id="edit-password"
+                />
+                <br/>
+                <div class="form-group">
+                    <label for="edit-roles">Role</label>
+                    <select class="form-select"
+                            size=2
+                            field="0"
+                            id="edit-roles" multiple="multiple"
+                    >
+                        <option value='{"id":1}'>USER</option>
+                        <option value='{"id":2}'>ADMIN</option>
+                    </select>
+                </div>
+                <br/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Close
+                </button>
+                <button id="editButton" type="button" class="btn btn-primary"
+                        data-bs-dismiss="modal">Edit
+                </button>
+            </div>
+            <script type="module">
+                document.getElementById("editButton").onclick = async function () {
+                    let updatedUser = {
+                        id: $("#editModal #edit-id").val(),
+                        firstName: $("#editModal #edit-name").val(),
+                        lastName: $("#editModal #edit-lastname").val(),
+                        age: $("#editModal #edit-age").val(),
+                        username: $("#editModal #edit-username").val(),
+                        buffPassword: $("#editModal #edit-password").val(),
+                        roles: JSON.parse("[" + $("#editModal #edit-roles").val() + "]")
+                    }
+                    console.log(JSON.stringify(updatedUser))
+                    //console.log( $("#editModal #edit-lastname").val())
+                    let url = 'http://localhost:8080/api/users'; //+ $("#exampleModal #delete-id").val();
+                    let response = await fetch(url, {
+                        method: 'PUT',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedUser)
+                    });
+                    await updateModule.updateAllUsers()
+                    await updateModule.userUpdate()
+                };
+            </script>
+        </div>
+    </div>
+</div>
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap  shadow">
-    <!--TODO подогнать класс user под отображение, добавить недостающие поля-->
-    <!--TODO сделать управление ролями из UI, начать с отображения, затем - все остальное-->
-    <!--TODO модальные окна-->
-    <!--TODO все надписи перевести на английский как в тз-->
     <ul class="list-group list-group-horizontal-sm ">
         <li class="list-group-item rounded-0 border-0 bg-body text-white pr-0">
-            <p class="fw-bold inline" th:text="${currentUser.getUsername()}"></p>
+            <p class="fw-bold inline" id = "headerUsername">aaa</p>
             <p class="fw-normal inline"> with roles: </p>
-            <p class="fw-normal inline" th:text="${currentUser.getRolesString()}"></p>
+            <p class="fw-normal inline" id = "headerRoles">bbb</p>
         </li>
     </ul>
     <ul class="navbar-nav px-3">
@@ -78,7 +373,6 @@
         </li>
     </ul>
 </nav>
-
 <div class="container-fluid d-flex flex-column">
     <div class="row flex-fill d-flex">
         <div class="col-2">
@@ -128,35 +422,12 @@
                                             </tbody>
                                         </table>
                                         <script type="module">
-                                            let url = 'http://localhost:8080/api/users';
-                                            let response = await fetch(url);
-                                            let users = await response.json();
-                                            buildTable(users);
-
-                                            function buildTable(data) {
-                                                var table = document.getElementById('allUsersTable')
-
-
-                                                for (var i = 0; i < data.length; i++) {
-                                                    var roleNames = data[i].roles.map(function (role) {
-                                                        return role['name'].replace('ROLE_', '');
-                                                    }).join(' ')
-
-                                                    var row = "<tr><td>" + data[i].id
-                                                        + "</td><td>" + data[i].firstName
-                                                        + "</td><td>" + data[i].lastName + "</td><td>" + data[i].age
-                                                        + "</td><td>" + data[i].username
-                                                        + "</td><td>" + roleNames
-                                                        + "</td><td>Edit</td><td>Delete</td></tr>"
-                                                    table.innerHTML += row
-                                                }
-                                            }
+                                            await updateModule.updateAllUsers()
                                         </script>
-
                                     </li>
                                 </ul>
-
                             </div>
+                            <!-- new user -->
                             <div class="tab-pane fade" id="newuser">
                                 <ul class="list-group">
                                     <li class="list-group-item bg-transparent">
@@ -166,55 +437,72 @@
                                         <div class="container mt-4 mb-2">
                                             <div class="row">
                                                 <div class="col-sm">
-
                                                 </div>
                                                 <div class="col-sm">
-                                                    <form th:action="@{~/admin}" th:method="POST"
-                                                          th:object="${newuser}">
+                                                    <form id="newForm">
 
                                                         <label for="name" class="form-label">First name: </label>
-                                                        <input type="text" class="form-control" th:field="*{firstName}"
+                                                        <input type="text" class="form-control" field=""
                                                                id="name"/>
                                                         <br/>
                                                         <label for="name2" class="form-label">Last name: </label>
-                                                        <input type="text" class="form-control" th:field="*{lastName}"
+                                                        <input type="text" class="form-control" field=""
                                                                id="name2"/>
                                                         <br/>
                                                         <label for="age" class="form-label">Age: </label>
                                                         <input type="number" class="form-control" step="1"
                                                                onchange="this.value = Math.max(0, Math.min(140, parseInt(this.value)))"
-                                                               th:field="*{age}" id="age"/>
+                                                               field="" id="age"/>
                                                         <br/>
                                                         <label for="username" class="form-label">Email: </label>
-                                                        <input type="email" class="form-control" th:field="*{username}"
+                                                        <input type="email" class="form-control" field=""
                                                                id="username"/>
                                                         <br/>
                                                         <label for="password" class="form-label">Password: </label>
                                                         <input type="password" class="form-control"
-                                                               th:field="*{password}" id="password"/>
+                                                               field="" id="password"/>
                                                         <br/>
                                                         <div class="form-group">
                                                             <label for="roles">Role</label>
-                                                            <select class="form-control" th:size="${rolesList.size()}"
-                                                                    th:field="*{roles}" id="roles" multiple="multiple">
-                                                                <option th:each="role : ${rolesList}"
-                                                                        th:field="*{roles}"
-                                                                        th:value="${{role}}"
-                                                                        th:text="${role}">Part name
-                                                                </option>
+                                                            <select class="form-control" size=""
+                                                                    field="" id="roles" multiple="multiple">
+
+                                                                <option value='{"id":1}' selected>USER</option>
+                                                                <option value='{"id":2}'>ADMIN</option>
                                                             </select>
                                                         </div>
                                                         <br/>
-
                                                         <div class="d-grid gap-2 col-4 mx-auto">
-                                                            <button type="submit" class="btn btn-success">Add new user
+                                                            <button type="button" id="newButton"
+                                                                    class="btn btn-success">Add new user
                                                             </button>
                                                         </div>
-
                                                     </form>
+                                                    <script type="module">
+                                                        document.getElementById("newButton").onclick = async function () {
+                                                            let newUser = {
+                                                                firstName: $("#newForm #name").val(),
+                                                                lastName: $("#newForm #name2").val(),
+                                                                age: $("#newForm #age").val(),
+                                                                username: $("#newForm #username").val(),
+                                                                password: $("#newForm #password").val(),
+                                                                roles: JSON.parse("[" + $("#newForm #roles").val() + "]")
+                                                            }
+                                                            //console.log(JSON.stringify(newUser))
+                                                            let url = 'http://localhost:8080/api/users'
+                                                            let response = await fetch(url, {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Accept': 'application/json',
+                                                                    'Content-Type': 'application/json'
+                                                                },
+                                                                body: JSON.stringify(newUser)
+                                                            });
+                                                            await updateModule.updateAllUsers()
+                                                        };
+                                                    </script>
                                                 </div>
                                                 <div class="col-sm">
-
                                                 </div>
                                             </div>
                                         </div>
@@ -224,7 +512,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="tab-pane fade show" id="user"
                      th:classappend="${#authorization.expression('hasRole(''ROLE_ADMIN'')')} ? '' : 'active'">
                     <div class="container mt-2">
@@ -248,29 +535,8 @@
                                     <tbody id="userInfo">
                                     </tbody>
                                 </table>
-                                <script type="module" th:inline="javascript">
-                                    /*[+
-                                    let url = 'http://localhost:8080/api/users/'+ [[${currentUser.getId()}]]
-                                    +]*/;
-                                    // <![CDATA[
-                                    let response = await fetch(url);
-                                    let data = await response.json();
-                                    console.log(data)
-                                    var table = document.getElementById('userInfo')
-
-                                    var roleNames = data.roles.map(function (role) {
-                                        return role['name'].replace('ROLE_', '');
-                                    }).join(' ')
-
-                                    var row = "<tr><td>" + data.id
-                                        + "</td><td>" + data.firstName
-                                        + "</td><td>" + data.lastName
-                                        + "</td><td>" + data.age
-                                        + "</td><td>" + data.username
-                                        + "</td><td>" + roleNames
-                                        + "</td></tr>"
-                                    table.innerHTML += row
-                                    // ]]>
+                                <script type="module">
+                                    updateModule.userUpdate()
                                 </script>
                             </li>
                         </ul>
