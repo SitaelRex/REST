@@ -12,11 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.dao.RoleRepository;
 import ru.kata.spring.boot_security.demo.dao.UserRepository;
 import ru.kata.spring.boot_security.demo.model.Role;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -37,8 +35,8 @@ public class UserServiceImpl implements UserDetailsService {
         roleRepository.save(new Role(2L, "ROLE_ADMIN"));
     }
 
-    public List<Role> getRoles() {
-        return roleRepository.findAll();
+    public Role getRole(String roleName) {
+        return roleRepository.findByName("ROLE_" + roleName);
     }
 
     @Transactional
