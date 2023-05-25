@@ -57,44 +57,48 @@
             async updateAllUsers() {
                 let url = 'http://localhost:8080/api/users';
                 let response = await fetch(url);
-                let users = await response.json();
-                document.getElementById('deleteModal').addEventListener('show.bs.modal', (e) => {
-                    var deleteid = e.relatedTarget.dataset.deleteid
-                    var deletename = e.relatedTarget.dataset.deletename
-                    var deletelastname = e.relatedTarget.dataset.deletelastname
-                    var deleteage = e.relatedTarget.dataset.deleteage
-                    var deleteusername = e.relatedTarget.dataset.deleteusername
-                    var deleteroles = e.relatedTarget.dataset.deleteroles
-                    $(".modal-body #delete-id").val(deleteid);
-                    $(".modal-body #delete-name").val(deletename);
-                    $(".modal-body #delete-lastname").val(deletelastname);
-                    $(".modal-body #delete-age").val(deleteage);
-                    $(".modal-body #delete-username").val(deleteusername);
-                    $(".modal-body #delete-roles").val(deleteroles);
-                    $("#deleteButton").data('id', deleteid)
-                });
-                document.getElementById('editModal').addEventListener('show.bs.modal', (e) => {
-                    var editid = e.relatedTarget.dataset.editid
-                    var editname = e.relatedTarget.dataset.editname
-                    var editlastname = e.relatedTarget.dataset.editlastname
-                    var editage = e.relatedTarget.dataset.editage
-                    var editusername = e.relatedTarget.dataset.editusername
-                    var editroles = e.relatedTarget.dataset.editroles
-                    $(".modal-body #edit-id").val(editid);
-                    $(".modal-body #edit-name").val(editname);
-                    $(".modal-body #edit-lastname").val(editlastname);
-                    $(".modal-body #edit-age").val(editage);
-                    $(".modal-body #edit-username").val(editusername);
-                    $(".modal-body #edit-roles").val(editroles);
-                    // $(".modal-body #edit-roles").val(JSON.parse(editroles.replace("'","\""))); //editroles
-                    if (editroles.includes("USER")) {
-                        $('option:contains("USER")').prop('selected', true);
-                    }
-                    if (editroles.includes("ADMIN")) {
-                        $('option:contains("ADMIN")').prop('selected', true);
-                    }
-                });
-                this.buildTable(users);
+                try {
+                    let users = await response.json();
+                    document.getElementById('deleteModal').addEventListener('show.bs.modal', (e) => {
+                        var deleteid = e.relatedTarget.dataset.deleteid
+                        var deletename = e.relatedTarget.dataset.deletename
+                        var deletelastname = e.relatedTarget.dataset.deletelastname
+                        var deleteage = e.relatedTarget.dataset.deleteage
+                        var deleteusername = e.relatedTarget.dataset.deleteusername
+                        var deleteroles = e.relatedTarget.dataset.deleteroles
+                        $(".modal-body #delete-id").val(deleteid);
+                        $(".modal-body #delete-name").val(deletename);
+                        $(".modal-body #delete-lastname").val(deletelastname);
+                        $(".modal-body #delete-age").val(deleteage);
+                        $(".modal-body #delete-username").val(deleteusername);
+                        $(".modal-body #delete-roles").val(deleteroles);
+                        $("#deleteButton").data('id', deleteid)
+                    });
+                    document.getElementById('editModal').addEventListener('show.bs.modal', (e) => {
+                        var editid = e.relatedTarget.dataset.editid
+                        var editname = e.relatedTarget.dataset.editname
+                        var editlastname = e.relatedTarget.dataset.editlastname
+                        var editage = e.relatedTarget.dataset.editage
+                        var editusername = e.relatedTarget.dataset.editusername
+                        var editroles = e.relatedTarget.dataset.editroles
+                        $(".modal-body #edit-id").val(editid);
+                        $(".modal-body #edit-name").val(editname);
+                        $(".modal-body #edit-lastname").val(editlastname);
+                        $(".modal-body #edit-age").val(editage);
+                        $(".modal-body #edit-username").val(editusername);
+                        $(".modal-body #edit-roles").val(editroles);
+                        // $(".modal-body #edit-roles").val(JSON.parse(editroles.replace("'","\""))); //editroles
+                        if (editroles.includes("USER")) {
+                            $('option:contains("USER")').prop('selected', true);
+                        }
+                        if (editroles.includes("ADMIN")) {
+                            $('option:contains("ADMIN")').prop('selected', true);
+                        }
+                    });
+                    this.buildTable(users);
+                } catch (e) {
+
+                }
                 this.getCurrentUser();
             },
             buildTable(data) {

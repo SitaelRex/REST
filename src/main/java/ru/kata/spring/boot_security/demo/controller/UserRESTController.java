@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
-import java.util.ArrayList;
 import java.util.Set;
 
 @RestController
@@ -24,12 +23,20 @@ public class UserRESTController {
         return userRoles.contains(userService.getRole("ADMIN"));
     }
 
+    private String errorResponse(HttpStatus status) {
+        String errorHtml =
+                "<header>"
+                        + "<script>window.location.replace('https://http.cat/"+status.value()+"'); </script>"
+                        + "</header>";
+        return errorHtml;
+    }
+
     @GetMapping("/users")
     public ResponseEntity<?> showAllUsers() {
         if (hasAdminRole()) {
             return new ResponseEntity<>(userService.getUsersList(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("ACCESS DENIED", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(errorResponse(HttpStatus.FORBIDDEN), HttpStatus.FORBIDDEN);
         }
     }
 
@@ -39,7 +46,7 @@ public class UserRESTController {
             User user = userService.getUser(id);
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
-        return new ResponseEntity<>("ACCESS DENIED", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(errorResponse(HttpStatus.FORBIDDEN), HttpStatus.FORBIDDEN);
     }
 
     @GetMapping("/currentuser")
@@ -59,7 +66,7 @@ public class UserRESTController {
             userService.saveUser(user);
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
-        return new ResponseEntity<>("ACCESS DENIED", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(errorResponse(HttpStatus.FORBIDDEN), HttpStatus.FORBIDDEN);
     }
 
     @PutMapping("/users")
@@ -68,7 +75,7 @@ public class UserRESTController {
             userService.updateUser(user.getId(), user);
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
-        return new ResponseEntity<>("ACCESS DENIED", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(errorResponse(HttpStatus.FORBIDDEN), HttpStatus.FORBIDDEN);
     }
 
     @DeleteMapping("/users/{id}")
@@ -77,7 +84,7 @@ public class UserRESTController {
             userService.deleteUser(id);
             return new ResponseEntity<>("DELETED!", HttpStatus.OK);
         }
-        return new ResponseEntity<>("ACCESS DENIED", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(errorResponse(HttpStatus.FORBIDDEN), HttpStatus.FORBIDDEN);
     }
 }
 
