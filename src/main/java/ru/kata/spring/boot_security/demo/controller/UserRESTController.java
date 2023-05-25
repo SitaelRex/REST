@@ -29,7 +29,7 @@ public class UserRESTController {
         if (hasAdminRole()) {
             return new ResponseEntity<>(userService.getUsersList(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new ArrayList<User>(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("ACCESS DENIED", HttpStatus.UNAUTHORIZED);
         }
     }
 
